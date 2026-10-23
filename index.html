@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Управление арендой недвижимости">
+    <title>Управление арендой</title>
+
+    <script>
+        try {
+            const savedTheme = localStorage.getItem('rent-theme');
+            if (savedTheme) {
+                document.documentElement.dataset.theme = savedTheme;
+            }
+        } catch (error) {}
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Перейти к основному контенту</a>
+
+    <header class="topbar">
+        <button id="menuBtn" class="menu-btn" aria-label="Открыть меню"
+            aria-expanded="false">☰</button>
+        <a class="logo" href="#" aria-label="Главная">Дом<span>+</span></a>
+        <div class="top-actions">
+            <label class="accent-label" for="accent">Цвет</label>
+            <input id="accent" type="color" value="#3563a9" aria-label="Акцентный цвет">
+            <select id="theme" aria-label="Тема оформления">
+                <option value="light">Светлая</option>
+                <option value="dark">Тёмная</option>
+                <option value="blue">Синяя</option>
+            </select>
+        </div>
+    </header>
+
+    <div id="overlay" class="overlay" hidden></div>
+
+    <div class="layout">
+        <aside id="sidebar" class="sidebar">
+            <p class="side-title">УПРАВЛЕНИЕ</p>
+            <nav aria-label="Основная навигация">
+                <button class="nav active" data-section="objects">⌂ Объекты</button>
+                <button class="nav" data-section="tenants">♙ Жильцы</button>
+                <button class="nav" data-section="payments">₽ Платежи</button>
+                <button class="nav" data-section="repairs">⚒ Ремонт</button>
+            </nav>
+            <div class="side-note">
+                <span class="status-dot"></span>
+                Все данные под рукой
+            </div>
+        </aside>
+
+        <main id="main" class="content">
+            <section class="welcome">
+                <div>
+                    <p class="eyebrow">РАБОЧИЙ СТОЛ</p>
+                    <h1 id="pageTitle">Объекты недвижимости</h1>
+                    <p class="muted">Управляйте арендой в одном месте.</p>
+                </div>
+                <button id="addBtn" class="btn btn-primary">＋ Добавить</button>
+            </section>
+
+            <section class="stats" aria-label="Краткая статистика">
+                <article class="stat-card">
+                    <span class="stat-icon">⌂</span>
+                    <p>Объекты</p>
+                    <strong id="countObjects">0</strong>
+                    <small>Всего в системе</small>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon">♙</span>
+                    <p>Жильцы</p>
+                    <strong id="countTenants">0</strong>
+                    <small>Записей в базе</small>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon">₽</span>
+                    <p>К оплате</p>
+                    <strong id="countPayments">0</strong>
+                    <small>Неоплаченные платежи</small>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon">⚒</span>
+                    <p>Ремонт</p>
+                    <strong id="countRepairs">0</strong>
+                    <small>Заявки в работе</small>
+                </article>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="listHeading">Список объектов</h2>
+                        <p class="muted">Поиск, фильтрация и управление записями</p>
+                    </div>
+                </div>
+
+                <form id="filters" class="filters">
+                    <div class="search-field">
+                        <label for="search">Поиск</label>
+                        <input id="search" type="search"
+                            placeholder="Название, адрес, описание...">
+                    </div>
+
+                    <div class="filter-field">
+                        <label for="status">Статус</label>
+                        <select id="status">
+                            <option value="">Все статусы</option>
+                        </select>
+                    </div>
+
+                    <label class="check-label">
+                        <input id="important" type="checkbox">
+                        Только важные
+                    </label>
+
+                    <div class="view-options">
+                        <label><input type="radio" name="view" value="table" checked> Таблица</label>
+                        <label><input type="radio" name="view" value="cards"> Карточки</label>
+                    </div>
+
+                    <button class="btn btn-light" type="reset">Сбросить</button>
+                </form>
+
+                <p id="loading" class="loading" hidden>Загружаем данные...</p>
+                <div id="results" class="results" aria-live="polite"></div>
+
+                <div class="pagination">
+                    <span id="pageInfo">Страница 1 из 1</span>
+                    <div>
+                        <button id="prev" class="btn btn-light" disabled>← Назад</button>
+                        <button id="next" class="btn btn-light" disabled>Далее →</button>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                Учебный проект · Управление арендой недвижимости
+            </footer>
+        </main>
+    </div>
+
+    <dialog id="modal" class="modal">
+        <form id="recordForm">
+            <div class="modal-heading">
+                <div>
+                    <p class="eyebrow">ЗАПИСЬ</p>
+                    <h2 id="modalTitle">Добавить запись</h2>
+                </div>
+                <button id="closeModal" class="icon-btn" type="button"
+                    aria-label="Закрыть">×</button>
+            </div>
+
+            <div id="formFields" class="form-fields"></div>
+
+            <div class="modal-footer">
+                <button id="cancel" class="btn btn-light" type="button">Отмена</button>
+                <button class="btn btn-primary" type="submit">Сохранить</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+
+    <script src="data.js"></script>
+    <script src="render.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
